@@ -12,17 +12,25 @@ import "./Ownable.sol";
 }*/
 
 contract GasContract is Ownable {
-    /* consolidate into one contract and make constants uint8 */
+    /*
+    remove Const contract and consolidate into one
+    make some variables into uint8
+    remove public from variable that are not called
+    */
     uint8 tradeFlag = 1;
     uint8 basicFlag = 0;
     uint8 dividendFlag = 1;
 
-    uint256 public totalSupply = 0; // cannot be updated
-    uint256 /*public*/ paymentCounter = 0;
-    mapping(address => uint256) public balances;
-    uint256 /*public*/ tradePercent = 12;
-    address /*public*/ contractOwner;
+    uint8 tradePercent = 12;
+    uint256 paymentCounter = 0;
+
     uint256 public tradeMode = 0;
+    uint256 public totalSupply = 0; // cannot be updated
+    
+    mapping(address => uint256) public balances;
+    
+    address contractOwner;
+    
     mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
     address[5] public administrators;
@@ -142,17 +150,17 @@ contract GasContract is Ownable {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
 
+        /*
+        consolidate if/then logic
+        */
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             if (_admins[ii] != address(0)) {
                 administrators[ii] = _admins[ii];
                 if (_admins[ii] == contractOwner) {
                     balances[contractOwner] = totalSupply;
+                    emit supplyChanged(_admins[ii], totalSupply);
                 } else {
                     balances[_admins[ii]] = 0;
-                }
-                if (_admins[ii] == contractOwner) {
-                    emit supplyChanged(_admins[ii], totalSupply);
-                } else if (_admins[ii] != contractOwner) {
                     emit supplyChanged(_admins[ii], 0);
                 }
             }
