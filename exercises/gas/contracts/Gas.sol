@@ -190,11 +190,12 @@ contract GasContract is Ownable {
         return ((status[0] == true), _tradeMode);
     }
 
-    error NeedValidNonZeroAddress();
     /*
     add a Custom Error and revert statement
     remove the return statement as it will already return payments_ variable
     */
+    error NeedValidNonZeroAddress();
+
     function getPayments(address _user)
         public view returns (Payment[] memory payments_) {
         /*require(
@@ -208,20 +209,32 @@ contract GasContract is Ownable {
         payments_ = payments[_user];
     }
 
+    /*
+    add 2 Custom Error messages with revert statements
+    */
+    error SenderInsufficientBalance();
+    error RecipientName8CharacterLimit();
+
     function transfer(
         address _recipient,
         uint256 _amount,
         string calldata _name
     ) public returns (bool status_) {
         address senderOfTx = msg.sender;
-        require(
+        /*require(
             balances[senderOfTx] >= _amount,
             "Gas Contract - Transfer function - Sender has insufficient Balance"
         );
         require(
             bytes(_name).length < 9,
             "Gas Contract - Transfer function -  The recipient name is too long, there is a max length of 8 characters"
-        );
+        );*/
+        if (balances[senderOfTx] < _amount) {
+            revert SenderInsufficientBalance();
+        }
+        if (bytes(_name).length > 8) {
+            revert RecipientName8CharacterLimit();
+        }
         balances[senderOfTx] -= _amount;
         balances[_recipient] += _amount;
         emit Transfer(_recipient, _amount);
