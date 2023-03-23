@@ -53,7 +53,8 @@ contract GasContract is Ownable {
         address updatedBy;
         uint256 blockNumber;
     }
-    uint256 wasLastOdd = 1;
+    // remove wasLastOdd variable and logic in later function
+    // uint256 wasLastOdd = 1;
     mapping(address => uint256) public isOddWhitelistUser;
     struct ImportantStruct {
         uint256 valueA; // max 3 digits
@@ -312,6 +313,11 @@ contract GasContract is Ownable {
             whitelist[_userAddrs] -= _tier;
             whitelist[_userAddrs] = 2;
         }
+        emit AddedToWhitelist(_userAddrs, _tier);
+
+        /*
+        remove section that seems totally unnecessary
+
         uint256 wasLastAddedOdd = wasLastOdd;
         if (wasLastAddedOdd == 1) {
             wasLastOdd = 0;
@@ -322,7 +328,7 @@ contract GasContract is Ownable {
         } else {
             revert("Contract hacked, imposible, call help");
         }
-        emit AddedToWhitelist(_userAddrs, _tier);
+        */
     }
 
     function whiteTransfer(
