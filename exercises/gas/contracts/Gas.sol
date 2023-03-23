@@ -321,16 +321,29 @@ contract GasContract is Ownable {
         }
     }
 
+    /*
+    add Custom Error
+    reduce logic and remove local variable
+    */
+    error TierLevelGreaterThan255();
+
     function addToWhitelist(address _userAddrs, uint256 _tier)
-        public
-        onlyAdminOrOwner
-    {
-        require(
+        public onlyAdminOrOwner {
+        if (_tier > 255) {
+            revert TierLevelGreaterThan255();
+        }
+        if (_tier >= 3) {
+            whitelist[_userAddrs] = 3;
+        } else {
+            whitelist[_userAddrs] = _tier;
+        }
+        emit AddedToWhitelist(_userAddrs, _tier);
+        /*require(
             _tier < 255,
             "Gas Contract - addToWhitelist function -  tier level should not be greater than 255"
         );
         whitelist[_userAddrs] = _tier;
-        if (_tier > 3) {
+        if (_tier >= 3) {
             whitelist[_userAddrs] -= _tier;
             whitelist[_userAddrs] = 3;
         } else if (_tier == 1) {
@@ -340,10 +353,8 @@ contract GasContract is Ownable {
             whitelist[_userAddrs] -= _tier;
             whitelist[_userAddrs] = 2;
         }
-        emit AddedToWhitelist(_userAddrs, _tier);
-
-        /*
-        remove section that seems totally unnecessary
+        
+        // remove section that seems totally unnecessary
 
         uint256 wasLastAddedOdd = wasLastOdd;
         if (wasLastAddedOdd == 1) {
@@ -357,7 +368,10 @@ contract GasContract is Ownable {
         }
         */
     }
-    
+
+    /*
+    add one Custom Error and reuse one from an earlier function
+    */ 
     error AmountSentMustExceed3();
 
     function whiteTransfer(
