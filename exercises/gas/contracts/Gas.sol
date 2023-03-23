@@ -282,13 +282,24 @@ contract GasContract is Ownable {
         return (status[0] == true);
     }
 
+
+    error IDMustBeGreaterThan0();
+    error AmountMustBeGreaterThan0();
+
     function updatePayment(
         address _user,
         uint256 _ID,
         uint256 _amount,
         PaymentType _type
     ) public onlyAdminOrOwner {
-        require(
+        if (_ID <= 0) {
+            revert IDMustBeGreaterThan0();
+        } else if (_amount <= 0) {
+            revert AmountMustBeGreaterThan0();
+        } else if (_user == address(0)) {
+            revert NeedValidNonZeroAddress();
+        }
+        /*require(
             _ID > 0,
             "Gas Contract - Update Payment function - ID must be greater than 0"
         );
@@ -302,6 +313,7 @@ contract GasContract is Ownable {
         );
 
         address senderOfTx = msg.sender;
+        */
 
         for (uint256 ii = 0; ii < payments[_user].length; ii++) {
             if (payments[_user][ii].paymentID == _ID) {
@@ -312,7 +324,7 @@ contract GasContract is Ownable {
                 bool tradingMode = getTradingMode();
                 addHistory(_user, tradingMode);
                 emit PaymentUpdated(
-                    senderOfTx,
+                    msg.sender,
                     _ID,
                     _amount,
                     payments[_user][ii].recipientName
