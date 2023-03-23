@@ -97,8 +97,22 @@ contract GasContract is Ownable {
         }
     }*/
 
+    error InvalidWhiteListTier();
+    error UserNotWhiteListed();
+    error CanOnlyCheckOwnAddress();
+
     modifier checkIfWhiteListed(address sender) {
-        address senderOfTx = msg.sender;
+        if (sender != msg.sender) {
+            revert CanOnlyCheckOwnAddress();
+        }
+        uint256 usersTier = whitelist[sender];
+        if (usersTier < 1) {
+            revert UserNotWhiteListed();
+        } else if (usersTier > 3) {
+            revert InvalidWhiteListTier();
+        }
+        _;
+        /*address senderOfTx = msg.sender;
         require(
             senderOfTx == sender,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the originator of the transaction was not the sender"
@@ -111,8 +125,7 @@ contract GasContract is Ownable {
         require(
             usersTier < 4,
             "Gas Contract CheckIfWhiteListed modifier : revert happened because the user's tier is incorrect, it cannot be over 4 as the only tier we have are: 1, 2, 3; therfore 4 is an invalid tier for the whitlist of this contract. make sure whitlist tiers were set correctly"
-        );
-        _;
+        );*/
     }
 
     event supplyChanged(address indexed, uint256 indexed);
@@ -344,30 +357,38 @@ contract GasContract is Ownable {
         }
         */
     }
+    
+    error AmountSentMustExceed3();
 
     function whiteTransfer(
         address _recipient,
         uint256 _amount,
         ImportantStruct memory _struct
     ) public checkIfWhiteListed(msg.sender) {
-        address senderOfTx = msg.sender;
+        // remove unnecessary local variable
+        // address senderOfTx = msg.sender;
+
+        if (balances[msg.sender] < _amount) {
+            revert SenderInsufficientBalance();
+        } else if (_amount <= 3) {
+            revert AmountSentMustExceed3();
+        }
+        /*
         require(
-            balances[senderOfTx] >= _amount,
+            balances[msg.sender] >= _amount,
             "Gas Contract - whiteTransfers function - Sender has insufficient Balance"
         );
         require(
             _amount > 3,
             "Gas Contract - whiteTransfers function - amount to send have to be bigger than 3"
-        );
-        balances[senderOfTx] -= _amount;
+        )*/
+        balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
-        balances[senderOfTx] += whitelist[senderOfTx];
-        balances[_recipient] -= whitelist[senderOfTx];
+        balances[msg.sender] += whitelist[msg.sender];
+        balances[_recipient] -= whitelist[msg.sender];
 
-        whiteListStruct[senderOfTx] = ImportantStruct(0, 0, 0);
-        ImportantStruct storage newImportantStruct = whiteListStruct[
-            senderOfTx
-        ];
+        whiteListStruct[msg.sender] = ImportantStruct(0, 0, 0);
+        ImportantStruct storage newImportantStruct = whiteListStruct[msg.sender];
         newImportantStruct.valueA = _struct.valueA;
         newImportantStruct.bigValue = _struct.bigValue;
         newImportantStruct.valueB = _struct.valueB;
