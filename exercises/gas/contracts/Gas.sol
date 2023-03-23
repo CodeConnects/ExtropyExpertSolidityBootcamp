@@ -66,7 +66,21 @@ contract GasContract is Ownable {
 
     event AddedToWhitelist(address userAddress, uint256 tier);
 
+
+    /*
+    add Custom Error with revert
+    slim down logic
+    */
+    error CallerNotAdminOrOwner();
+
     modifier onlyAdminOrOwner() {
+        if(!checkForAdmin(msg.sender) || contractOwner != msg.sender) {
+            revert CallerNotAdminOrOwner();
+        }
+        _;
+    }
+
+    /*modifier onlyAdminOrOwner() {
         address senderOfTx = msg.sender;
         if (checkForAdmin(senderOfTx)) {
             require(
@@ -81,7 +95,7 @@ contract GasContract is Ownable {
                 "Error in Gas contract - onlyAdminOrOwner modifier : revert happened because the originator of the transaction was not the admin, and furthermore he wasn't the owner of the contract, so he cannot run this function"
             );
         }
-    }
+    }*/
 
     modifier checkIfWhiteListed(address sender) {
         address senderOfTx = msg.sender;
