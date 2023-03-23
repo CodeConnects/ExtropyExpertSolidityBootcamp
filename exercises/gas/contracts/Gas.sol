@@ -1,20 +1,27 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+// pragma solidity 0.8.0;
+// upgrade solidity version so Custom Errors can be used
+pragma solidity 0.8.18;
 
 import "./Ownable.sol";
 
-contract Constants {
+/*contract Constants {
     uint256 public tradeFlag = 1;
     uint256 public basicFlag = 0;
     uint256 public dividendFlag = 1;
-}
+}*/
 
-contract GasContract is Ownable, Constants {
+contract GasContract is Ownable {
+    /* consolidate into one contract and make constants uint8 */
+    uint8 tradeFlag = 1;
+    uint8 basicFlag = 0;
+    uint8 dividendFlag = 1;
+
     uint256 public totalSupply = 0; // cannot be updated
-    uint256 public paymentCounter = 0;
+    uint256 /*public*/ paymentCounter = 0;
     mapping(address => uint256) public balances;
-    uint256 public tradePercent = 12;
-    address public contractOwner;
+    uint256 /*public*/ tradePercent = 12;
+    address /*public*/ contractOwner;
     uint256 public tradeMode = 0;
     mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
@@ -133,28 +140,38 @@ contract GasContract is Ownable, Constants {
     }
 
     function checkForAdmin(address _user) public view returns (bool admin_) {
-        bool admin = false;
+        /*bool admin = false;
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             if (administrators[ii] == _user) {
                 admin = true;
             }
         }
-        return admin;
+        return admin;*/
+        admin_ = false;
+        for (uint256 ii = 0; ii < administrators.length; ii++) {
+            if (administrators[ii] == _user) {
+                admin_ = true;
+                return admin_;
+            }
+        }
     }
 
     function balanceOf(address _user) public view returns (uint256 balance_) {
-        uint256 balance = balances[_user];
-        return balance;
+        /*uint256 balance = balances[_user];
+        return balance;*/
+        balance_ = balances[_user];
     }
 
     function getTradingMode() public view returns (bool mode_) {
-        bool mode = false;
+        /*bool mode = false;
         if (tradeFlag == 1 || dividendFlag == 1) {
             mode = true;
         } else {
             mode = false;
         }
-        return mode;
+        return mode;*/
+        mode_ = false;
+        if (tradeFlag == 1 || dividendFlag == 1) mode_ = true;
     }
 
     function addHistory(address _updateAddress, bool _tradeMode)
