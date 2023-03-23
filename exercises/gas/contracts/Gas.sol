@@ -190,16 +190,22 @@ contract GasContract is Ownable {
         return ((status[0] == true), _tradeMode);
     }
 
+    error NeedValidNonZeroAddress();
+    /*
+    add a Custom Error and revert statement
+    remove the return statement as it will already return payments_ variable
+    */
     function getPayments(address _user)
-        public
-        view
-        returns (Payment[] memory payments_)
-    {
-        require(
+        public view returns (Payment[] memory payments_) {
+        /*require(
             _user != address(0),
             "Gas Contract - getPayments function - User must have a valid non zero address"
         );
-        return payments[_user];
+        return payments[_user];*/
+        if (_user == address(0)) {
+            revert NeedValidNonZeroAddress();
+        }
+        payments_ = payments[_user];
     }
 
     function transfer(
