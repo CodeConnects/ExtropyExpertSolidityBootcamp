@@ -64,13 +64,18 @@ contract GasContract is Ownable {
     // remove wasLastOdd variable and logic in later function
     // uint256 wasLastOdd = 1;
     // mapping(address => uint256) public isOddWhitelistUser;
+    /*
+    remove unused ImportantStruct
+    
     struct ImportantStruct {
         uint256 valueA; // max 3 digits
         uint256 bigValue;
         uint256 valueB; // max 3 digits
     }
+    */
 
-    mapping(address => ImportantStruct) public whiteListStruct;
+    // remove unused ImportantStruct
+    // mapping(address => ImportantStruct) public whiteListStruct;
 
     event AddedToWhitelist(address userAddress, uint256 tier);
 
@@ -314,7 +319,6 @@ contract GasContract is Ownable {
         */
     }
 
-
     error IDMustBeGreaterThan0();
     error AmountMustBeGreaterThan0();
 
@@ -423,8 +427,9 @@ contract GasContract is Ownable {
 
     function whiteTransfer(
         address _recipient,
-        uint256 _amount,
-        ImportantStruct memory _struct
+        uint256 _amount
+        // remove unused ImportantStruct
+        // ImportantStruct memory _struct
     ) public checkIfWhiteListed(msg.sender) {
         // remove unnecessary local variable
         // address senderOfTx = msg.sender;
@@ -448,11 +453,16 @@ contract GasContract is Ownable {
         balances[msg.sender] += whitelist[msg.sender];
         balances[_recipient] -= whitelist[msg.sender];
 
+        emit WhiteListTransfer(_recipient);
+
+        /*
+        remove unused ImportantStruct
+
         whiteListStruct[msg.sender] = ImportantStruct(0, 0, 0);
         ImportantStruct storage newImportantStruct = whiteListStruct[msg.sender];
         newImportantStruct.valueA = _struct.valueA;
         newImportantStruct.bigValue = _struct.bigValue;
         newImportantStruct.valueB = _struct.valueB;
-        emit WhiteListTransfer(_recipient);
+        */
     }
 }
