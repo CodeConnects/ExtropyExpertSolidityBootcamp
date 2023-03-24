@@ -30,9 +30,9 @@ contract GasContract is Ownable {
     uint256 public immutable totalSupply; // cannot be updated
     
     mapping(address => uint256) public balances;
-    address contractOwner;
     mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
+    address contractOwner;
     address[5] public administrators;
     
     enum PaymentType {
@@ -178,6 +178,10 @@ contract GasContract is Ownable {
         return paymentHistory;
     */
 
+    /*
+    add a break statement if admin address is a match
+    remove return statement and use built-in
+    */
     function checkForAdmin(address _user) public view returns (bool admin_) {
         /*bool admin = false;
         for (uint256 ii = 0; ii < administrators.length; ii++) {
