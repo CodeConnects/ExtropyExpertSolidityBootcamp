@@ -223,8 +223,6 @@ contract GasContract is Ownable {
         mode_ = false;
         if (tradeFlag == 1 || dividendFlag == 1) {
             mode_ = true;
-        } else {
-            
         }
     }
 
