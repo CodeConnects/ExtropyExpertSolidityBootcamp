@@ -16,25 +16,25 @@ contract GasContract is Ownable {
     remove Const contract and consolidate into one
     make some variables into uint8
     remove public from variable that are not called
+    basicFlag is never used, so remove it
     */
     uint8 tradeFlag = 1;
-    uint8 basicFlag = 0;
     uint8 dividendFlag = 1;
 
     uint8 tradePercent = 12;
     uint256 paymentCounter = 0;
-
     uint256 public tradeMode = 0;
-    uint256 public totalSupply = 0; // cannot be updated
+    
+    // this variable is not used bool public isReady = false;
+    // make totalSupply immutable since it cannot be updated
+    uint256 public immutable totalSupply; // cannot be updated
     
     mapping(address => uint256) public balances;
-    
     address contractOwner;
-    
     mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
     address[5] public administrators;
-    bool public isReady = false;
+    
     enum PaymentType {
         Unknown,
         BasicPayment,
@@ -63,7 +63,7 @@ contract GasContract is Ownable {
     }
     // remove wasLastOdd variable and logic in later function
     // uint256 wasLastOdd = 1;
-    mapping(address => uint256) public isOddWhitelistUser;
+    // mapping(address => uint256) public isOddWhitelistUser;
     struct ImportantStruct {
         uint256 valueA; // max 3 digits
         uint256 bigValue;
@@ -167,13 +167,16 @@ contract GasContract is Ownable {
         }
     }
 
+    /*
+    paymentHistory is public, so it already has a built-in getter function
+
     function getPaymentHistory()
         public
         payable
         returns (History[] memory paymentHistory_)
     {
         return paymentHistory;
-    }
+    */
 
     function checkForAdmin(address _user) public view returns (bool admin_) {
         /*bool admin = false;
@@ -187,17 +190,24 @@ contract GasContract is Ownable {
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             if (administrators[ii] == _user) {
                 admin_ = true;
-                return admin_;
+                break;
             }
         }
     }
 
+    /*
+    remove local variable and use the auto-return
+    */
     function balanceOf(address _user) public view returns (uint256 balance_) {
+        balance_ = balances[_user];
         /*uint256 balance = balances[_user];
         return balance;*/
-        balance_ = balances[_user];
     }
 
+    /*
+    remove local variable
+    remove return statement and use auto-return of function
+    */
     function getTradingMode() public view returns (bool mode_) {
         /*bool mode = false;
         if (tradeFlag == 1 || dividendFlag == 1) {
@@ -207,23 +217,30 @@ contract GasContract is Ownable {
         }
         return mode;*/
         mode_ = false;
-        if (tradeFlag == 1 || dividendFlag == 1) mode_ = true;
+        if (tradeFlag == 1 || dividendFlag == 1) {
+            mode_ = true;
+        } else {
+            
+        }
     }
 
-    function addHistory(address _updateAddress, bool _tradeMode)
-        public
+    function addHistory(address _updateAddress/*, bool _tradeMode*/) public
+        /* the return values are not used, so comment them out
         returns (bool status_, bool tradeMode_)
+        */
     {
         History memory history;
         history.blockNumber = block.number;
         history.lastUpdate = block.timestamp;
         history.updatedBy = _updateAddress;
         paymentHistory.push(history);
+        /*
         bool[] memory status = new bool[](tradePercent);
         for (uint256 i = 0; i < tradePercent; i++) {
             status[i] = true;
         }
         return ((status[0] == true), _tradeMode);
+        */
     }
 
     /*
@@ -255,8 +272,8 @@ contract GasContract is Ownable {
         address _recipient,
         uint256 _amount,
         string calldata _name
-    ) public returns (bool status_) {
-        address senderOfTx = msg.sender;
+    ) public /*returns (bool status_)*/ {
+        // address senderOfTx = msg.sender;
         /*require(
             balances[senderOfTx] >= _amount,
             "Gas Contract - Transfer function - Sender has insufficient Balance"
@@ -265,13 +282,13 @@ contract GasContract is Ownable {
             bytes(_name).length < 9,
             "Gas Contract - Transfer function -  The recipient name is too long, there is a max length of 8 characters"
         );*/
-        if (balances[senderOfTx] < _amount) {
+        if (balances[msg.sender] < _amount) {
             revert SenderInsufficientBalance();
         }
         if (bytes(_name).length > 8) {
             revert RecipientName8CharacterLimit();
         }
-        balances[senderOfTx] -= _amount;
+        balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
         emit Transfer(_recipient, _amount);
         Payment memory payment;
@@ -282,12 +299,16 @@ contract GasContract is Ownable {
         payment.amount = _amount;
         payment.recipientName = _name;
         payment.paymentID = ++paymentCounter;
-        payments[senderOfTx].push(payment);
+        payments[msg.sender].push(payment);
+        /*
+        status is never used for anything, so comment out
+
         bool[] memory status = new bool[](tradePercent);
         for (uint256 i = 0; i < tradePercent; i++) {
             status[i] = true;
         }
         return (status[0] == true);
+        */
     }
 
 
@@ -302,9 +323,11 @@ contract GasContract is Ownable {
     ) public onlyAdminOrOwner {
         if (_ID <= 0) {
             revert IDMustBeGreaterThan0();
-        } else if (_amount <= 0) {
+        }
+        if (_amount <= 0) {
             revert AmountMustBeGreaterThan0();
-        } else if (_user == address(0)) {
+        }
+        if (_user == address(0)) {
             revert NeedValidNonZeroAddress();
         }
         /*require(
@@ -329,8 +352,9 @@ contract GasContract is Ownable {
                 payments[_user][ii].admin = _user;
                 payments[_user][ii].paymentType = _type;
                 payments[_user][ii].amount = _amount;
-                bool tradingMode = getTradingMode();
-                addHistory(_user, tradingMode);
+                // tradingMode is not used to comment out
+                //bool tradingMode = getTradingMode();
+                addHistory(_user/*, tradingMode*/);
                 emit PaymentUpdated(
                     msg.sender,
                     _ID,
