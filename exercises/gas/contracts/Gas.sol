@@ -18,14 +18,17 @@ contract GasContract is Ownable {
     remove public from variable that are not called
     basicFlag is never used, so remove it
     */
+    // isReady is not used, so remove it 
+    // bool public isReady = false;
+
     uint8 tradeFlag = 1;
     uint8 dividendFlag = 1;
-
-    uint8 tradePercent = 12;
     uint256 paymentCounter = 0;
     uint256 public tradeMode = 0;
     
-    // this variable is not used bool public isReady = false;
+    // tradePercent has no method of change, so make a constant
+    uint8 constant tradePercent = 12;
+    
     // make totalSupply immutable since it cannot be updated
     uint256 public immutable totalSupply; // cannot be updated
     
