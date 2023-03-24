@@ -266,6 +266,7 @@ contract GasContract is Ownable {
 
     /*
     add 2 Custom Error messages with revert statements
+    remove status as it is never used
     */
     error SenderInsufficientBalance();
     error RecipientName8CharacterLimit();
