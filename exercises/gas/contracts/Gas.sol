@@ -23,20 +23,20 @@ contract GasContract is Ownable {
 
     uint8 tradeFlag = 1;
     uint8 dividendFlag = 1;
-    uint256 paymentCounter = 0;
-    uint256 public tradeMode = 0;
-    
+
     // tradePercent has no method of change, so make a constant
     uint8 constant tradePercent = 12;
-    
+    uint256 paymentCounter = 0;
+    uint256 public tradeMode = 0;
     // make totalSupply immutable since it cannot be updated
     uint256 public immutable totalSupply; // cannot be updated
+
+    address contractOwner;
+    address[5] public administrators;
     
     mapping(address => uint256) public balances;
     mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
-    address contractOwner;
-    address[5] public administrators;
     
     enum PaymentType {
         Unknown,
@@ -81,7 +81,6 @@ contract GasContract is Ownable {
     // mapping(address => ImportantStruct) public whiteListStruct;
 
     event AddedToWhitelist(address userAddress, uint256 tier);
-
 
     /*
     add Custom Error with revert
@@ -161,7 +160,7 @@ contract GasContract is Ownable {
         /*
         consolidate if/then logic
         */
-        for (uint256 ii = 0; ii < administrators.length; ii++) {
+        for (uint256 ii = 0; ii < 5; ii++) {
             if (_admins[ii] != address(0)) {
                 administrators[ii] = _admins[ii];
                 if (_admins[ii] == contractOwner) {
@@ -191,6 +190,13 @@ contract GasContract is Ownable {
     remove return statement and use built-in
     */
     function checkForAdmin(address _user) public view returns (bool admin_) {
+        admin_ = false;
+        for (uint256 ii = 0; ii < 5; ii++) {
+            if (administrators[ii] == _user) {
+                admin_ = true;
+                break;
+            }
+        }
         /*bool admin = false;
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             if (administrators[ii] == _user) {
@@ -198,13 +204,6 @@ contract GasContract is Ownable {
             }
         }
         return admin;*/
-        admin_ = false;
-        for (uint256 ii = 0; ii < administrators.length; ii++) {
-            if (administrators[ii] == _user) {
-                admin_ = true;
-                break;
-            }
-        }
     }
 
     /*
@@ -442,6 +441,18 @@ contract GasContract is Ownable {
         } else if (_amount <= 3) {
             revert AmountSentMustExceed3();
         }
+        balances[msg.sender] -= _amount - whitelist[msg.sender];
+        balances[_recipient] += _amount - whitelist[msg.sender];
+        emit WhiteListTransfer(_recipient);
+        /*
+        reduce math logic
+        
+        balances[msg.sender] -= _amount;
+        balances[_recipient] += _amount;
+        balances[msg.sender] += whitelist[msg.sender];
+        balances[_recipient] -= whitelist[msg.sender];
+        */
+
         /*
         require(
             balances[msg.sender] >= _amount,
@@ -451,12 +462,6 @@ contract GasContract is Ownable {
             _amount > 3,
             "Gas Contract - whiteTransfers function - amount to send have to be bigger than 3"
         )*/
-        balances[msg.sender] -= _amount;
-        balances[_recipient] += _amount;
-        balances[msg.sender] += whitelist[msg.sender];
-        balances[_recipient] -= whitelist[msg.sender];
-
-        emit WhiteListTransfer(_recipient);
 
         /*
         remove unused ImportantStruct

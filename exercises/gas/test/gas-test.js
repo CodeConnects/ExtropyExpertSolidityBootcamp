@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 describe("Gas1", function () {
   let gasContract;
   let owner, addr1, addr2, addr3;
-  let importantStruct = [101, 100000000000000, 202];
+  //let importantStruct = [101, 100000000000000, 202];
 
   beforeEach(async function () {
     [owner, addr1, addr2, addr3] = await ethers.getSigners();
