@@ -3,15 +3,7 @@
 // upgrade solidity version so Custom Errors can be used
 pragma solidity 0.8.18;
 
-import "./Ownable.sol";
-
-/*contract Constants {
-    uint256 public tradeFlag = 1;
-    uint256 public basicFlag = 0;
-    uint256 public dividendFlag = 1;
-}*/
-
-contract GasContract is Ownable {
+contract GasContract {
     /*
     remove Const contract and consolidate into one
     make some variables into uint8
@@ -156,7 +148,6 @@ contract GasContract is Ownable {
     constructor(address[] memory _admins, uint256 _totalSupply) {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
-
         /*
         consolidate if/then logic
         */
