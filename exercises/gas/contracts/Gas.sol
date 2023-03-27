@@ -35,8 +35,8 @@ contract GasContract is Ownable {
     address[5] public administrators;
     
     mapping(address => uint256) public balances;
-    mapping(address => Payment[]) public payments;
     mapping(address => uint256) public whitelist;
+    mapping(address => Payment[]) public payments;
     
     enum PaymentType {
         Unknown,
@@ -51,18 +51,18 @@ contract GasContract is Ownable {
 
     struct Payment {
         PaymentType paymentType;
-        uint256 paymentID;
-        bool adminUpdated;
         string recipientName; // max 8 characters
+        bool adminUpdated;
+        uint256 paymentID;
+        uint256 amount;
         address recipient;
         address admin; // administrators address
-        uint256 amount;
     }
 
     struct History {
         uint256 lastUpdate;
-        address updatedBy;
         uint256 blockNumber;
+        address updatedBy;
     }
     // remove wasLastOdd variable and logic in later function
     // uint256 wasLastOdd = 1;
